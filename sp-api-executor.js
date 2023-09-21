@@ -9,11 +9,11 @@ class SpApiExecutor {
 
   /**
    * API実行
-   * @param {string} HTTPメソッド
-   * @param {string} APIのパス
-   * @param {object} クエリパラメタ(キー値ペアオブジェクト)
-   * @param {object} ヘッダパラメタ(キー値ペアオブジェクト) 省略可
-   * @param {string} リクエストボディ
+   * @param {string} httpMethod - HTTPメソッド
+   * @param {string} apiPath - APIのパス
+   * @param {object} queryParams - クエリパラメタ(キー値ペアオブジェクト)
+   * @param {object} headerParams - ヘッダパラメタ(キー値ペアオブジェクト) 省略可
+   * @param {string} body - リクエストボディ　- 文字列で指定（JSONならstringifyした状態）
    */
   execute({
     httpMethod,
@@ -28,6 +28,8 @@ class SpApiExecutor {
     // ヘッダ省略時はデフォルトのヘッダ取得
     if (!headerParams) {
       headerParams = this.composeDefaultHeader(now);
+    } else {
+      headerParams = {...headerParams, ...this.composeDefaultHeader(now)};
     }
 
     // URL
@@ -53,12 +55,13 @@ class SpApiExecutor {
     const res = UrlFetchApp.fetch(
       this.composeUrl(endpointUrl, apiPath, queryParams, pathParams), {
         muteHttpExceptions: true,
-        method: 'GET',
-        headers: headerParams
+        method: httpMethod,
+        headers: headerParams,
+        payload: body
       }
     );
-    if (res.getResponseCode() != 200) {
-      console.error(`getOrders 失敗 コード:${res.getResponseCode()}\n${res.getContentText()}`);
+    if (res.getResponseCode() >= 300) {
+      console.error(`execute 失敗 コード:${res.getResponseCode()}\n${res.getContentText()}`);
       throw new Error(res.getContentText());
     }
     return JSON.parse(res.getContentText());
@@ -155,11 +158,11 @@ class SpApiExecutor {
   }) {
     const prop = PropertiesService.getScriptProperties().getProperties();
     const connector = new SpApiConnector({
-      refreshToken: prop.REFRESH_TOKEN,
-      lwaClientId: prop.LWA_CLIENT_ID,
-      lwaClientSecret: prop.LWA_CLIENT_SECRET,
-      iamAccessKey: prop.IAM_USER_ACCESS_KEY,
-      iamSecretKey: prop.IAM_USER_SECRET_ACCESS_KEY,
+      refreshToken,
+      lwaClientId,
+      lwaClientSecret,
+      iamAccessKey,
+      iamSecretKey,
     });
     connector.requestAccessToken();
     connector.requestAssumeRole(prop.ROLE_ARN);

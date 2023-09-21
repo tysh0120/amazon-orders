@@ -167,20 +167,3 @@ class SpApiConnector {
     this._sessionToken = parseResult[3];
   }
 }
-
-function stsTest() {
-  const prop = PropertiesService.getScriptProperties().getProperties();
-  //const url = prop.STS_ENDPOINT;
-  const conn = new SpApiConnector({
-    refreshToken: prop.REFRESH_TOKEN,
-    lwaClientId: prop.LWA_CLIENT_ID,
-    lwaClientSecret: prop.LWA_CLIENT_SECRET,
-    iamAccessKey: prop.IAM_USER_ACCESS_KEY,
-    iamSecretKey: prop.IAM_USER_SECRET_ACCESS_KEY
-  });
-
-  conn.requestAccessToken()
-  console.log(conn.accessToken);
-
-  conn.requestAssumeRole(prop.ROLE_ARN);
-}

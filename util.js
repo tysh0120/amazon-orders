@@ -54,6 +54,15 @@ function getISO8601Date(date) {
 }
 
 /**
+ * ISO8601形式日付文字列取得
+ * @param {object} date
+ * @return 日付文字列  YYYY-MM-DDThh:mm:ssZ形式
+ */
+function getISO08601DateLongFormat(date) {
+  return Utilities.formatDate(date, 'GMT', "yyyy-MM-dd'T'HH:mm:ss'Z'");
+}
+
+/**
  * バイナリへ変換
  * @param {string} hexStr
  * @return {string} バイナリ文字列
