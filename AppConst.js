@@ -9,6 +9,7 @@ const MENU_SHEET = {
     TIME_FROM: "E10",
     DATE_TO: "H10",
     TIME_TO: "I10",
+    OUTPUT_URL: "G24",
   }
 }
 

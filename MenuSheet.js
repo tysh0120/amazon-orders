@@ -49,6 +49,13 @@ class MenuSheet {
     this.sheet.getRange(this.cellPos.DATE_TO).setValue(datetime);
     this.sheet.getRange(this.cellPos.TIME_TO).setValue(Utilities.formatDate(datetime, 'JST', 'HH:mm:ss'));
   }
+
+  /**
+   * 出力先 URL取得
+   */
+  getOutputSsUrl() {
+    return this.sheet.getRange(this.cellPos.OUTPUT_URL).getValue();
+  }
 }
 
 const menuSheet = new MenuSheet();

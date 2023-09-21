@@ -16,7 +16,10 @@ function execute() {
   const outputRows = getFBAShipmentReportAndComponent(dtFr, dtTo);
 
   if (outputRows.length > 0) {
-    const sheet = SpreadsheetApp.getActive().getSheetByName("[amazon]在庫管理");
+    const sheet =
+      SpreadsheetApp.openByUrl(menuSheet.getOutputSsUrl()).
+      getSheetByName("[amazon]在庫管理");
+
     sheet.getRange(sheet.getLastRow() + 1, 1, outputRows.length, outputRows[0].length).
       setValues(outputRows);
   }
