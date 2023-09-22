@@ -19,14 +19,13 @@ class SpApiConnector {
     lwaClientId,
     lwaClientSecret,
     iamAccessKey,
-    iamSecretKey,
+    iamSecretKey
   }) {
     this.refreshToken = refreshToken;
     this.lwaClientId = lwaClientId;
     this.lwaClientSecret = lwaClientSecret;
     this._iamAccessKey = iamAccessKey;
     this._iamSecretKey = iamSecretKey;
-    this.prop = PropertiesService.getScriptProperties().getProperties();
   }
 
   /**
@@ -83,7 +82,7 @@ class SpApiConnector {
    * LWA AccessTokenを取得する
    */
   requestAccessToken() {
-    const url = this.prop.TOKEN_ENDPOINT;
+    const url = URLS.TOKEN_ENDPOINT;
     const payload = {
       grant_type: 'refresh_token',
       refresh_token: this.refreshToken,
@@ -106,13 +105,13 @@ class SpApiConnector {
    */
   requestAssumeRole(roleArn) {
     const now = new Date();
-    const endpointUrl = this.prop.STS_ENDPOINT;
+    const endpointUrl = URLS.STS_ENDPOINT;
 
     const queryParams = {
       Version: '2011-06-15',
       Action: 'AssumeRole',
       RoleSessionName: 'Test',
-      RoleArn: this.prop.ROLE_ARN,
+      RoleArn: roleArn,
       DurationSeconds: 3600,
     };
 
@@ -127,7 +126,7 @@ class SpApiConnector {
     }
 
     // 署名計算クラス生成
-    const awsRegion = this.prop.AWS_REGION;
+    const awsRegion = AWS_REGION;
     const signer = new SpApiSigner({
       service: "sts",
       awsRegion,

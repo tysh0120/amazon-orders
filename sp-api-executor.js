@@ -4,7 +4,6 @@
 class SpApiExecutor {
   constructor(spApiConnector) {
     this.spApiConnector = spApiConnector;
-    this.prop = PropertiesService.getScriptProperties().getProperties();
   }
 
   /**
@@ -33,10 +32,10 @@ class SpApiExecutor {
     }
 
     // URL
-    const endpointUrl = this.prop.SP_API_ENDPOINT;
+    const endpointUrl = URLS.SP_API_ENDPOINT;
     const signer = new SpApiSigner({
       service: "execute-api",
-      awsRegion: this.prop.AWS_REGION,
+      awsRegion: AWS_REGION,
       iamAccessKey: this.spApiConnector.accessKeyId,
       iamSecretKey: this.spApiConnector.secretAccessKey,
       httpMethod,
@@ -147,6 +146,7 @@ class SpApiExecutor {
    * @param {string} lwaClientSecret
    * @param {string} iamAccessKey
    * @param {string} iamSecretKey
+   * @param {string} roleArn
    * @return SP-API実行クラスインスタンス
    */
   static createSpApiExecutor({
@@ -154,19 +154,47 @@ class SpApiExecutor {
     lwaClientId,
     lwaClientSecret,
     iamAccessKey,
-    iamSecretKey
+    iamSecretKey,
+    roleArn
   }) {
-    const prop = PropertiesService.getScriptProperties().getProperties();
     const connector = new SpApiConnector({
       refreshToken,
       lwaClientId,
       lwaClientSecret,
       iamAccessKey,
-      iamSecretKey,
+      iamSecretKey
     });
     connector.requestAccessToken();
-    connector.requestAssumeRole(prop.ROLE_ARN);
+    connector.requestAssumeRole(roleArn);
 
     return new SpApiExecutor(connector);
   }
+}
+
+
+/**
+ * SP-API実行クラスインスタンス生成
+ * @param {string} refreshToken
+ * @param {string} lwaClientId
+ * @param {string} lwaClientSecret
+ * @param {string} iamAccessKey
+ * @param {string} iamSecretKey
+ * @return SP-API実行クラスインスタンス
+ */
+function createSpApiExecutor({
+    refreshToken,
+    lwaClientId,
+    lwaClientSecret,
+    iamAccessKey,
+    iamSecretKey,
+    roleArn
+}) {
+  return SpApiExecutor.createSpApiExecutor({
+    refreshToken,
+    lwaClientId,
+    lwaClientSecret,
+    iamAccessKey,
+    iamSecretKey,
+    roleArn
+  });
 }

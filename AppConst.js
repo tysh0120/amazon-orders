@@ -13,5 +13,11 @@ const MENU_SHEET = {
   }
 }
 
+const URLS = {
+  STS_ENDPOINT: "https://sts.amazonaws.com",
+  TOKEN_ENDPOINT: "https://api.amazon.com/auth/o2/token",
+  SP_API_ENDPOINT: "https://sellingpartnerapi-fe.amazon.com",
+}
+const AWS_REGION = "us-east-1";
 
-const MARKET_PLACE_ID = PropertiesService.getScriptProperties().getProperty('MARKET_PLACE_ID');
+const MARKET_PLACE_ID = "A1VC38T7YXB528";// 日本
