@@ -50,20 +50,37 @@ class SpApiExecutor {
     // Authorizationヘッダ追加
     headerParams.Authorization = signer.getAuthorizationHeaderVal();
 
-    // エンドポイントにリクエスト発行
-    const res = UrlFetchApp.fetch(
-      this.composeUrl(endpointUrl, apiPath, queryParams, pathParams), {
-        muteHttpExceptions: true,
-        method: httpMethod,
-        headers: headerParams,
-        payload: body
+    // リクエスト発行
+    // 419 quota exceeded の場合、リトライ回数分リトライ
+    let retryCount = 0;  // リトライ回数
+    let responseCode; // レスポンスコード
+    let result;
+    do {
+      console.log(responseCode, apiPath);   // debugs
+      retryCount++;
+      // エンドポイントにリクエスト発行
+      result = UrlFetchApp.fetch(
+        this.composeUrl(endpointUrl, apiPath, queryParams, pathParams), {
+          muteHttpExceptions: true,
+          method: httpMethod,
+          headers: headerParams,
+          payload: body
+        }
+      );
+      responseCode = result.getResponseCode();
+      // リトライ回数以内であればリトライ
+      if (responseCode == 429 && retryCount < RETRY_COUNT) { // quota exceeded
+        console.error(`execute 失敗 コード:`);
+        console.log(`QUOTA  retryCount:[${retryCount}]  ${result.getResponseCode()}\n${result.getContentText()}`);
+        // スリープ　間隔はインターバル * リトライ回数　　(回数が増えるほど長くなる)
+        Utilities.sleep(RETRY_INTERVAL * retryCount);
+        continue;
+      } else if (responseCode >= 300) {
+        console.error(`execute 失敗 コード:${result.getResponseCode()}\n${result.getContentText()}`);
+        throw new Error(result.getContentText());
       }
-    );
-    if (res.getResponseCode() >= 300) {
-      console.error(`execute 失敗 コード:${res.getResponseCode()}\n${res.getContentText()}`);
-      throw new Error(res.getContentText());
-    }
-    return JSON.parse(res.getContentText());
+    } while (responseCode >= 300)
+    return JSON.parse(result.getContentText());
   }
 
   /**
