@@ -24,5 +24,5 @@ const MARKET_PLACE_ID = "A1VC38T7YXB528";// 日本
 
 
 // 429 QUOTA EXCEEDED 時のリトライ回数
-const RETRY_COUNT = 3;
+const RETRY_COUNT = 10;
 const RETRY_INTERVAL = 1000;
